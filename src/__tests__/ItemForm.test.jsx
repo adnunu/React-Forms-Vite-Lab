@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ItemForm from "../components/ItemForm";
-import App from "../components/App";
+import App from "../App";
 
 test("calls the onItemFormSubmit callback prop when the form is submitted", () => {
   const onItemFormSubmit = vi.fn()

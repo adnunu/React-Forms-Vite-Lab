@@ -1,27 +1,50 @@
-import React, { useState } from "react";
-import ItemForm from "./ItemForm";
-import Filter from "./Filter";
+// src/components/ShoppingList.jsx
+import { useState } from "react";
 import Item from "./Item";
+import Filter from "./Filter";
 
-function ShoppingList({ items }) {
+function ShoppingList({ items = [], search: externalSearch, onSearchChange: externalOnSearchChange }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [internalSearch, setInternalSearch] = useState("");
 
-  function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
-  }
+  // Use external props if provided, otherwise use internal state
+  const search = externalSearch !== undefined ? externalSearch : internalSearch;
+  const handleSearchChange = externalOnSearchChange !== undefined ? externalOnSearchChange : setInternalSearch;
 
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
-
-    return item.category === selectedCategory;
+  const filteredItems = items.filter((item) => {
+    if (!item) return false;
+    
+    // Category filter
+    if (selectedCategory !== "All" && item.category !== selectedCategory) {
+      return false;
+    }
+    
+    // Search filter
+    if (search && !item.name.toLowerCase().includes(search.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
   });
 
   return (
     <div className="ShoppingList">
-      <ItemForm />
-      <Filter onCategoryChange={handleCategoryChange} />
+      <Filter search={search} onSearchChange={handleSearchChange} />
+      <select
+        name="filter"
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="All">Filter by category</option>
+        <option value="Produce">Produce</option>
+        <option value="Dairy">Dairy</option>
+        <option value="Dessert">Dessert</option>
+        <option value="Bakery">Bakery</option>
+        <option value="Meat">Meat</option>
+        <option value="Canned Goods">Canned Goods</option>
+      </select>
       <ul className="Items">
-        {itemsToDisplay.map((item) => (
+        {filteredItems.map((item) => (
           <Item key={item.id} name={item.name} category={item.category} />
         ))}
       </ul>
